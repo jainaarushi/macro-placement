@@ -14,15 +14,15 @@ The cache files in cache/ are the end result of a multi-phase pipeline.
 Each phase reads from the best available preceding cache and writes its own
 output directory, so any phase can be re-run independently.
 
-| # | Phase | Script | Output | GPU |
-|---|---|---|---|---|
-| 1 | Global placement (DREAMPlace) | _overnight.py, _dp_all_benches.py | /tmp/dp_overnight/ | Yes |
-| 2 | Build cache + legalize | _build_cache.py, _ckpt_repair.py | cache/, cache_legal/ | No |
-| 3 | AutoDMP TPE knob search | _autodmp_search.py, _replay_knobs.py | cache_autodmp/ | Yes |
-| 4a | Soft-macro diffusion v2 | _run_sa_diffusion.py | cache_sa_12/ | No |
-| 4b | Hot-net outlier hauler | _run_outlier_hauler.py | cache_hauler/ | No |
-| 4c | Hotness-weighted spectral (HWSP) | _run_hwsp.py | cache_hwsp/ | No |
-| 5 | Hard-macro CD + pairwise swap | _hard_cd_swap.py | cache_hard2/ | No |
+| # | Phase | Script | Output |
+|---|---|---|---|
+| 1 | Global placement (DREAMPlace) | _overnight.py, _dp_all_benches.py | /tmp/dp_overnight/ |
+| 2 | Build cache + legalize | _build_cache.py, _ckpt_repair.py | cache/, cache_legal/ |
+| 3 | AutoDMP TPE knob search | _autodmp_search.py, _replay_knobs.py | cache_autodmp/ |
+| 4a | Soft-macro diffusion v2 | _run_sa_diffusion.py | cache_sa_12/ |
+| 4b | Hot-net outlier hauler | _run_outlier_hauler.py | cache_hauler/ |
+| 4c | Hotness-weighted spectral (HWSP) | _run_hwsp.py | cache_hwsp/ |
+| 5 | Hard-macro CD + pairwise swap | _hard_cd_swap.py | cache_hard2/ |
 
 ## Modules
 
