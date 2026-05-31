@@ -1,0 +1,48 @@
+FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-devel
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV CUDA_HOME=/usr/local/cuda
+ENV PATH=${CUDA_HOME}/bin:${PATH}
+ENV LD_LIBRARY_PATH=${CUDA_HOME}/lib64:${LD_LIBRARY_PATH}
+
+# A100 SXM4 = sm_80 — added alongside the AMD-side targets 8.6/8.9/9.0
+ENV TORCH_CUDA_ARCH_LIST="8.0;8.6;8.9;9.0"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential ca-certificates git wget unzip cmake \
+    bison flex libfl-dev libboost-all-dev libcairo2-dev \
+    zlib1g-dev tcl-dev libpython3-dev pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir \
+    pyunpack patool matplotlib cairocffi pkgconfig setuptools \
+    scipy "numpy==1.26.4" shapely torch-optimizer ncg-optimizer \
+    "protobuf==4.25.3" absl-py
+
+# Clone DREAMPlace
+RUN git clone --recursive https://github.com/limbo018/DREAMPlace.git /opt/DREAMPlace/src
+
+# torch.cuda.is_available() returns False during docker build (no GPU device),
+# so TorchExtension.cmake skips CUDA. Patch it to always report CUDA=1;
+# nvcc and the full toolkit are present in this base image.
+RUN sed -i 's/print(int(torch.cuda.is_available()))/print(1)/' \
+    /opt/DREAMPlace/src/cmake/TorchExtension.cmake
+
+WORKDIR /opt/DREAMPlace/src
+# CUDA_CUDA_LIBRARY: libcuda.so is injected at runtime by the NVIDIA toolkit
+# and doesn't exist at build time — point cmake at the stub instead.
+RUN mkdir -p build && cd build && \
+    cmake .. \
+        -DCMAKE_INSTALL_PREFIX=/opt/DREAMPlace/install \
+        -DPYTHON_EXECUTABLE=$(which python3) \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCUDA_CUDA_LIBRARY=/usr/local/cuda/lib64/stubs/libcuda.so \
+    && make -j$(nproc) install
+
+# Symlink so AMD-side scripts that hardcode /DREAMPlace/... still work
+RUN ln -s /opt/DREAMPlace /DREAMPlace
+
+ENV DREAMPLACE_PLACER=/opt/DREAMPlace/install/dreamplace/Placer.py
+ENV PYTHONPATH=/opt/DREAMPlace/install:${PYTHONPATH}
+
+WORKDIR /

@@ -1,0 +1,26 @@
+{
+  "ibm01": {
+    "proxy_cost": 0.928311846797871,
+    "wirelength_cost": 0.07097782095320414,
+    "density_cost": 0.5066317782023319,
+    "congestion_cost": 1.2080362734870018,
+    "overlap_count": 0,
+    "candidates_seen": 6
+  },
+  "ibm02": {
+    "proxy_cost": 1.3406692902953639,
+    "wirelength_cost": 0.07421596574193215,
+    "density_cost": 0.521310566776061,
+    "congestion_cost": 2.0115960823308026,
+    "overlap_count": 6,
+    "candidates_seen": 6
+  },
+  "ibm03": {
+    "proxy_cost": 1.1386676652161982,
+    "wirelength_cost": 0.08683622629189709,
+    "density_cost": 0.5034185495166874,
+    "congestion_cost": 1.6002443283319148,
+    "overlap_count": 12,
+    "candidates_seen": 6
+  }
+}
